@@ -5,18 +5,38 @@ import MovieList from "./components/MovieList";
 
 function App() {
   const [movies, setMovies] = useState([]);
+  const [error, setError] = useState("");
 
   const handleSearch = async (query) => {
-    const API_KEY = "e44046ee";
-    const response = await fetch(`https://www.omdbapi.com/?s=${query}&apikey=${API_KEY}`);
-    const data = await response.json();
-    if (data.Search) setMovies(data.Search);
+    if (!query) return;
+
+    const API_KEY = "522a9ca5";
+
+    try {
+      const response = await fetch(
+        `https://www.omdbapi.com/?s=${query}&apikey=${API_KEY}`
+      );
+      const data = await response.json();
+
+      if (data.Response === "True") {
+        setMovies(data.Search);
+        setError("");
+      } else {
+        setMovies([]);
+        setError("No movies found 😕");
+      }
+    } catch (err) {
+      setError("Something went wrong. Try again.");
+    }
   };
 
   return (
-    <div className="App">
-      <h1>Movie Listing App 🎬</h1>
+    <div className="app">
+      <h1>🎬 Movie Listing App</h1>
       <SearchBar onSearch={handleSearch} />
+
+      {error && <p style={{ marginBottom: "20px" }}>{error}</p>}
+
       <MovieList movies={movies} />
     </div>
   );
